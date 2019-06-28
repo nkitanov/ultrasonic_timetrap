@@ -13,17 +13,19 @@ int sensity_t;
 int OFF_INTERVAL = 1000;
 int ON_INTERVAL = 75;
 int sens5 = 245; // EEPROM value for sensitivity 5m, etc.
-int sens4 = 220;
-int sens3 = 196;
-int sens2 = 147;
-int sens1 = 98;
-int sens0 = 49;
+int sens4 = 220; // 4.5m
+int sens3 = 196; // 4m
+int sens2 = 147; // 3m
+int sens1 = 98;  // 2m
+int sens0 = 49;  // 1m
 unsigned long timeMeasure = 0;
 unsigned long currentTime;
 unsigned long nextTime;
 bool block;
 bool pressed;
 bool set;
+int blinks;
+int blink_sens_level;
 byte sens_eeprom;
 int sensitivity;
 
@@ -79,6 +81,42 @@ void blink_red_led_startup() {
  }
 }
 
+void display_sens_level() {
+  if (millis() > 7000) {
+  
+    set = true;
+
+    if (sens_eeprom == sens5) {
+      blink_sens_level = 6;
+    }
+    else if (sens_eeprom == sens4) {
+      blink_sens_level = 5;
+    }
+    else if (sens_eeprom == sens3) {
+      blink_sens_level = 4;
+    }
+    else if (sens_eeprom == sens2) {
+      blink_sens_level = 3;
+    }
+    else if (sens_eeprom == sens1) {
+      blink_sens_level = 2;
+    }
+    else if (sens_eeprom == sens1) {
+      blink_sens_level = 1;
+    }
+    else {
+      blink_sens_level = 0;
+    }
+
+  while (blinks < blink_sens_level) {
+    digitalWrite(LED_GREEN, HIGH); delay (500);
+    digitalWrite(LED_GREEN, LOW); delay (1000);
+    blinks++;
+   } 
+  }
+set = false;
+}
+
 void setup_mode() {
   if (millis() < 7000) {
     set = true;
@@ -126,6 +164,7 @@ void loop() {
   button.read();  // Continuously read the status of the button. 
   pressed = button.isPressed();
   blink_red_led_startup();
+  display_sens_level();
   
   if(!set) {
     green_led_block_mode();
