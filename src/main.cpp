@@ -154,14 +154,13 @@ void setup() {
   pinMode(LED_GREEN, OUTPUT);  
   button.onSequence(2, 2000, two_click);
   button.onPressedFor(3000, setup_mode);
-  // Read sensitivity from EEPROM
-  sens_eeprom = EEPROM.read(0);
-  sensitivity = sens_eeprom * 4;
+    sens_eeprom = EEPROM.read(0); // Read sensitivity from EEPROM
+  sensitivity = sens_eeprom * 4;  // Convert sensitivity for ADC resolution
 }
 
 void loop() {
   digitalWrite(RXLED, HIGH); // Turn off RX led on MCU board
-  button.read();  // Continuously read the status of the button. 
+  button.read(); // Continuously read the status of the button. 
   pressed = button.isPressed();
   blink_red_led_startup();
   display_sens_level();
