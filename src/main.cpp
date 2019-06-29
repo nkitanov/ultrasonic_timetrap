@@ -39,8 +39,8 @@ byte sens_eeprom;
 
 
 void two_click() {
-  if (!set && !_setup) { // Do not run during initial phase and setup
-    if (block) {  //Toggle measure hold block with 2 click of the button
+  if (!set && !_setup) {  // Do not run during initial phase and setup
+    if (block) {          //Toggle measure hold block with 2 click of the button
       block = false;
     }
     else {
@@ -49,7 +49,7 @@ void two_click() {
   }
 }
 
- // Blink Green LED constanlty
+ // Blink Green LED constanlty while working
 void blink_green_led() {
  if (millis() > 5000) {
  unsigned long currentTime = millis();
@@ -65,7 +65,8 @@ void blink_green_led() {
  }
 }
 
-void green_led_block_mode() {   // Shorter green blink intervals during blockage of sensor
+// Shorter green blink intervals during blockage of sensor
+void green_led_block_mode() {
   if(pressed || block) {
     OFF_INTERVAL = 200;
     ON_INTERVAL = 50;
@@ -93,6 +94,13 @@ void blink_red_led_startup() {
 }
 
 // Display sensitivity level
+// 1 blink --> 1m
+// 2 blinks --> 2m
+// 3 blinks --> 3m
+// 4 blinks --> 4m
+// 5 blinks --> 4.5m
+// 4 blinks --> 5m
+// no blinks --> unset
 void display_sens_level() {
    if (millis() > 5000 && !display_sens_run && !_setup) {
   
@@ -132,7 +140,7 @@ void display_sens_level() {
  set = false;
 }
 
- // Count clicks during sensitivity setup
+ // Count button clicks during sensitivity setup
  void onPressed() {
    if (_setup) {
     clicks++;
@@ -140,26 +148,33 @@ void display_sens_level() {
  }
 
 // Set sensitivity and store it in EEPROM pepmanently 
+// 0 clicks --> 5m
+// 1 clicks --> 4.5m
+// 2 clicks --> 4m
+// 3 clicks --> 3m
+// 4 clicks --> 2m
+// 5 clicks --> 1m
+// other    --> 5m
  void set_sensitivity() {
   if (_setup) {
     currentTime = millis();
-    if (clicks == 6) {
-      sens_eeprom = sens5;
-    }
-    else if (clicks == 5) {
-      sens_eeprom = sens4;
+    if (clicks == 5) {
+      sens_eeprom = sens0;
     }
     else if (clicks == 4) {
-      sens_eeprom = sens3;
-    }
-    else if (clicks == 2) {
-      sens_eeprom = sens2;
-    }
-    else if (clicks == 1) {
       sens_eeprom = sens1;
     }
+    else if (clicks == 3) {
+      sens_eeprom = sens2;
+    }
+    else if (clicks == 2) {
+      sens_eeprom = sens3;
+    }
+    else if (clicks == 1) {
+      sens_eeprom = sens4;
+    }
     else {
-      sens_eeprom = sens0;
+      sens_eeprom = sens5;
     }
     if (currentTime > exitSet) {    // Wait 10 seconds for input, set and exit
       sensitivity = sens_eeprom * 4;
@@ -181,9 +196,9 @@ void display_sens_level() {
    }
  }
 
+// Check sensor for object in front
 void check_sensor() {
 if (millis() > 5000) {
-  // Check sensor for object in front
  if (!pressed && !block) {
   if (millis() - timeMeasure > 1000) { // Block measurement for 1sec after previous
     sensity_t = analogRead(sensityPin);
@@ -210,7 +225,7 @@ void setup() {
   button.onSequence(2, 2000, two_click);
   button.onPressedFor(3000, setup_mode);
   button.onPressed(onPressed);
-  sens_eeprom = EEPROM.read(0); // Read sensitivity from EEPROM
+  sens_eeprom = EEPROM.read(0);   // Read sensitivity from EEPROM
   sensitivity = sens_eeprom * 4;  // Convert sensitivity for ADC
 }
 
