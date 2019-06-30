@@ -36,7 +36,6 @@ bool _setup;
 byte sens_eeprom;
 
 
-
 void two_click() {
   if (!set && !_setup) {  // Do not run during initial phase and setup
     if (block) {          //Toggle measure hold block with 2 click of the button
@@ -146,7 +145,7 @@ void display_sens_level() {
    }
  }
 
-// Set sensitivity and store it in EEPROM pepmanently 
+// Set sensitivity and store it in EEPROM pepmanently (reversed for failsafe)
 // 0 clicks --> 5m
 // 1 clicks --> 4.5m
 // 2 clicks --> 4m
@@ -156,6 +155,7 @@ void display_sens_level() {
 // other    --> 5m
  void set_sensitivity() {
   if (_setup) {
+    set = true;   // Keep in set mode to block run main until diplay of sense levels complete in main loop
     currentTime = millis();
     if (clicks == 5) {
       sens_eeprom = sens0;
@@ -180,7 +180,6 @@ void display_sens_level() {
       EEPROM.update(0, sens_eeprom);
       digitalWrite(LED_RED, HIGH); delay(3000);
       digitalWrite(LED_RED, LOW); delay(1000);
-      display_sens_level();
       _setup = false;
     }
   }    
@@ -208,7 +207,7 @@ if (millis() > 5000) {
    }
   }
  }
-     // Turn off RED led after 200ms of measurement
+    // Turn off RED led after 200ms of measurement
     if (millis() - timeMeasure > 200) {
     digitalWrite(LED_RED, LOW);
    }
