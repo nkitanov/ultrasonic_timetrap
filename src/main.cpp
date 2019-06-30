@@ -5,7 +5,6 @@
 #define BUTTON_PIN 9
 EasyButton button(BUTTON_PIN);
 
-int RXLED = 17;
 int sensityPin = A0;
 int LED_RED = 6;
 int LED_GREEN = 7;
@@ -219,7 +218,6 @@ if (millis() > 5000) {
 void setup() {
   Consumer.begin();
   button.begin();
-  pinMode(RXLED, OUTPUT);
   pinMode(LED_RED, OUTPUT);
   pinMode(LED_GREEN, OUTPUT);  
   button.onSequence(2, 2000, two_click);
@@ -230,13 +228,12 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(RXLED, HIGH); // Turn off RX led on MCU board
   button.read(); // Continuously read the status of the button. 
   pressed = button.isPressed();
   blink_red_led_startup();
   display_sens_level();
   set_sensitivity();
-  
+    
   // Run main program
   if(!set && !_setup) {
     green_led_block_mode();
