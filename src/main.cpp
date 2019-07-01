@@ -38,10 +38,9 @@ byte sens_eeprom;
 
 void two_click() {
   if (!set && !_setup) {  // Do not run during initial phase and setup
-    if (block) {          //Toggle measure hold block with 2 click of the button
+    if (block) {          // Toggle measure hold block with 2 click of the button
       block = false;
-    }
-    else {
+    } else {
       block = true;
     }
   }
@@ -49,27 +48,26 @@ void two_click() {
 
  // Blink Green LED constanlty while working
 void blink_green_led() {
- if (millis() > 5000) {
- unsigned long currentTime = millis();
- if (currentTime > nextTime) {
-   if (digitalRead(LED_GREEN)) {
-     digitalWrite(LED_GREEN, LOW);
-     nextTime = currentTime + OFF_INTERVAL;
-   } else {
-     digitalWrite(LED_GREEN, HIGH);
-     nextTime = currentTime + ON_INTERVAL;
-   }
+  if (millis() > 5000) {
+    unsigned long currentTime = millis();
+    if (currentTime > nextTime) {
+      if (digitalRead(LED_GREEN)) {
+        digitalWrite(LED_GREEN, LOW);
+        nextTime = currentTime + OFF_INTERVAL;
+      } else {
+        digitalWrite(LED_GREEN, HIGH);
+        nextTime = currentTime + ON_INTERVAL;
+      }
+    }
   }
- }
 }
 
 // Shorter green blink intervals during blockage of sensor
 void green_led_block_mode() {
-  if(pressed || block) {
+  if (pressed || block) {
     OFF_INTERVAL = 200;
     ON_INTERVAL = 50;
-  }
-  else {
+  } else {
     OFF_INTERVAL = 1000;
     ON_INTERVAL = 75;
   }
@@ -78,17 +76,17 @@ void green_led_block_mode() {
 // Blink LED fast after power on for 5s
 void blink_red_led_startup() {
   if (millis() < 5000) {
-  currentTime = millis();
-  if (currentTime > nextTime) {
-   if (digitalRead(LED_RED)) {
-     digitalWrite(LED_RED, LOW);
-     nextTime = currentTime + 150;
-   } else {
-     digitalWrite(LED_RED, HIGH);
-     nextTime = currentTime + 50;
-   }
+    currentTime = millis();
+    if (currentTime > nextTime) {
+      if (digitalRead(LED_RED)) {
+        digitalWrite(LED_RED, LOW);
+        nextTime = currentTime + 150;
+      } else {
+        digitalWrite(LED_RED, HIGH);
+        nextTime = currentTime + 50;
+      }
+    }
   }
- }
 }
 
 // Display sensitivity level
@@ -100,42 +98,35 @@ void blink_red_led_startup() {
 // 4 blinks --> 5m
 // no blinks --> unset
 void display_sens_level() {
-   if (millis() > 5000 && !display_sens_run && !_setup) {
-  
+  if (millis() > 5000 && !display_sens_run && !_setup) {
     set = true;
     display_sens_run = true;  //Run it only one time
 
     if (sens_eeprom == sens5) {
       blink_sens_level = 6;
-    }
-    else if (sens_eeprom == sens4) {
+    } else if (sens_eeprom == sens4) {
       blink_sens_level = 5;
-    }
-    else if (sens_eeprom == sens3) {
+    } else if (sens_eeprom == sens3) {
       blink_sens_level = 4;
-    }
-    else if (sens_eeprom == sens2) {
+    } else if (sens_eeprom == sens2) {
       blink_sens_level = 3;
-    }
-    else if (sens_eeprom == sens1) {
+    } else if (sens_eeprom == sens1) {
       blink_sens_level = 2;
-    }
-    else if (sens_eeprom == sens0) {
+    } else if (sens_eeprom == sens0) {
       blink_sens_level = 1;
-    }
-    else {
+    } else {
       blink_sens_level = 0;
     }
 
-  // Indicate sensitivity level with number of blinks
-  while (blinks < blink_sens_level) {
-    digitalWrite(LED_GREEN, HIGH); delay (500);
-    digitalWrite(LED_GREEN, LOW); delay (1000);
-    blinks++;
-   } 
-   delay(1000);
+    // Indicate sensitivity level with number of blinks
+    while (blinks < blink_sens_level) {
+      digitalWrite(LED_GREEN, HIGH); delay (500);
+      digitalWrite(LED_GREEN, LOW); delay (1000);
+      blinks++;
+    } 
+    delay(1000);
   }
- set = false;
+  set = false;
 }
 
  // Count button clicks during sensitivity setup
@@ -159,20 +150,15 @@ void display_sens_level() {
     currentTime = millis();
     if (clicks == 5) {
       sens_eeprom = sens0;
-    }
-    else if (clicks == 4) {
+    } else if (clicks == 4) {
       sens_eeprom = sens1;
-    }
-    else if (clicks == 3) {
+    } else if (clicks == 3) {
       sens_eeprom = sens2;
-    }
-    else if (clicks == 2) {
+    } else if (clicks == 2) {
       sens_eeprom = sens3;
-    }
-    else if (clicks == 1) {
+    } else if (clicks == 1) {
       sens_eeprom = sens4;
-    }
-    else {
+    } else {
       sens_eeprom = sens5;
     }
     if (currentTime > exitSet) {    // Wait 10 seconds for input, set and exit
@@ -182,36 +168,36 @@ void display_sens_level() {
       digitalWrite(LED_RED, LOW); delay(1000);
       _setup = false;
     }
-  }    
+  } 
 }
 
- void setup_mode() {
-   if (millis() < 5000) {
-     _setup = true;
-     digitalWrite(LED_RED, HIGH); delay(3000);
-     digitalWrite(LED_RED, LOW);
+void setup_mode() {
+  if (millis() < 5000) {
+    _setup = true;
+    digitalWrite(LED_RED, HIGH); delay(3000);
+    digitalWrite(LED_RED, LOW);
     exitSet = currentTime + 10000; 
-   }
- }
+  }
+}
 
 // Check sensor for object in front
 void check_sensor() {
-if (millis() > 5000) {
- if (!pressed && !block) {
-  if (millis() - timeMeasure > 1000) { // Block measurement for 1sec after previous
-    sensity_t = analogRead(sensityPin);
-    if (sensity_t < sensitivity && sensity_t > 40) {
-      Consumer.write(MEDIA_VOLUME_UP); // Command volume up to pin the time
-      timeMeasure = millis();
-      digitalWrite(LED_RED, HIGH);
-   }
-  }
- }
+  if (millis() > 5000) {
+    if (!pressed && !block) {
+      if (millis() - timeMeasure > 1000) { // Block measurement for 1sec after previous
+        sensity_t = analogRead(sensityPin);
+        if (sensity_t < sensitivity && sensity_t > 40) {
+          Consumer.write(MEDIA_VOLUME_UP); // Command volume up to pin the time
+          timeMeasure = millis();
+          digitalWrite(LED_RED, HIGH);
+        }
+      }
+    }
     // Turn off RED led after 200ms of measurement
     if (millis() - timeMeasure > 200) {
-    digitalWrite(LED_RED, LOW);
-   }
- }
+      digitalWrite(LED_RED, LOW);
+    }
+  }
 }
 
 void setup() {
@@ -234,7 +220,7 @@ void loop() {
   set_sensitivity();
     
   // Run main program
-  if(!set && !_setup) {
+  if (!set && !_setup) {
     green_led_block_mode();
     blink_green_led();
     check_sensor();
