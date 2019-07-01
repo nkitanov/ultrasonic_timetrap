@@ -11,9 +11,9 @@ int LED_GREEN = 7;
 int sensity_t;
 int OFF_INTERVAL = 1000;
 int ON_INTERVAL = 75;
-int ONE_SECOND = 1000;
-int THREE_SECONDS = 3000;
-int FIVE_SECONDS = 5000;
+unsigned long ONE_SECOND = 1000;
+unsigned long THREE_SECONDS = 3000;
+unsigned long FIVE_SECONDS = 5000;
 int sens5 = 245; // EEPROM value for sensitivity 5m, etc.
 int sens4 = 220; // 4.5m
 int sens3 = 196; // 4m
@@ -91,26 +91,6 @@ void blink_red_led_startup() {
   }
 }
 
-// Display sensitivity level
-// 1 blink --> 1m
-// 2 blinks --> 2m
-// 3 blinks --> 3m
-// 4 blinks --> 4m
-// 5 blinks --> 4.5m
-// 6 blinks --> 5m
-// no blinks --> unset
-void display_sens_level() {
-  if (millis() > FIVE_SECONDS && !display_sens_run && !_setup) {
-    set = true;
-    display_sens_run = true;  //Run it only one time
-
-    int blink_sens_level = get_sens_level();
-    show_sensitivity(blink_sens_level);
-    delay(ONE_SECOND);
-  }
-  set = false;
-}
-
 // Get current sensitivity level
 int get_sens_level() {
   if (sens_eeprom == sens5) return 6;
@@ -131,29 +111,32 @@ void show_sensitivity(int level) {
   }
 }
 
+// Display sensitivity level
+// 1 blink --> 1m
+// 2 blinks --> 2m
+// 3 blinks --> 3m
+// 4 blinks --> 4m
+// 5 blinks --> 4.5m
+// 6 blinks --> 5m
+// no blinks --> unset
+void display_sens_level() {
+  if (millis() > FIVE_SECONDS && !display_sens_run && !_setup) {
+    set = true;
+    display_sens_run = true;  //Run it only one time
+
+    int blink_sens_level = get_sens_level();
+    show_sensitivity(blink_sens_level);
+    delay(ONE_SECOND);
+  }
+  set = false;
+}
+
  // Count button clicks during sensitivity setup
  void onPressed() {
    if (_setup) {
     clicks++;
    }
  }
-
-// Set sensitivity and store it in EEPROM pepmanently (reversed for failsafe)
-void set_sensitivity() {
-  if (_setup) {
-    set = true;   // Keep in set mode to block run main until diplay of sense levels complete in main loop
-    currentTime = millis();
-    sens_eeprom = get_clicks_sensitivity();
-
-    if (currentTime > exitSet) {    // Wait 10 seconds for input, set and exit
-      sensitivity = sens_eeprom * 4;
-      EEPROM.update(0, sens_eeprom);
-      digitalWrite(LED_RED, HIGH); delay(THREE_SECONDS);
-      digitalWrite(LED_RED, LOW); delay(ONE_SECOND);
-      _setup = false;
-    }
-  } 
-}
 
 // Get sensitivity based on number of clicks
 // 0 clicks --> 5m
@@ -170,6 +153,23 @@ int get_clicks_sensitivity() {
   if (clicks == 2) return sens3;
   if (clicks == 1) return sens4;
   return sens5;
+}
+
+// Set sensitivity and store it in EEPROM pepmanently (reversed for failsafe)
+void set_sensitivity() {
+  if (_setup) {
+    set = true;   // Keep in set mode to block run main until diplay of sense levels complete in main loop
+    currentTime = millis();
+    sens_eeprom = get_clicks_sensitivity();
+
+    if (currentTime > exitSet) {    // Wait 10 seconds for input, set and exit
+      sensitivity = sens_eeprom * 4;
+      EEPROM.update(0, sens_eeprom);
+      digitalWrite(LED_RED, HIGH); delay(THREE_SECONDS);
+      digitalWrite(LED_RED, LOW); delay(ONE_SECOND);
+      _setup = false;
+    }
+  } 
 }
 
 void setup_mode() {
