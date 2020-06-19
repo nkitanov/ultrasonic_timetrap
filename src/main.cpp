@@ -40,15 +40,15 @@ bool _setup;
 byte sens_eeprom;
 
 
-// void two_click() {
-//   if (!set && !_setup) {  // Do not run during initial phase and setup
-//     if (block) {          // Toggle measure hold block with 2 click of the button
-//       block = false;
-//     } else {
-//       block = true;
-//     }
-//   }
-// }
+void two_click() {
+  if (!set && !_setup) {  // Do not run during initial phase and setup
+    if (block) {          // Toggle measure hold block with 2 click of the button
+      block = false;
+    } else {
+      block = true;
+    }
+  }
+}
 
  // Blink Green LED constanlty while working
 void blink_green_led() {
@@ -214,7 +214,7 @@ void setup() {
   button.begin();
   pinMode(LED_RED, OUTPUT);
   pinMode(LED_GREEN, OUTPUT);  
-  // button.onSequence(2, 2000, two_click);
+  button.onSequence(2, 2000, two_click);
   button.onPressedFor(THREE_SECONDS, setup_mode);
   button.onPressed(onPressed);
   sens_eeprom = EEPROM.read(0);   // Read sensitivity from EEPROM
