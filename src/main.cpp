@@ -23,7 +23,7 @@ int sens0 = 49;  // 1m
 int blinks;
 int sensitivity;
 int clicks;
-int debounceMeasurements = 3; //successive measurements needed to register
+int debounceMeasurements = 3; //successive measurements x 33ms needed to register
 int successiveMeasurements = 0;
 
 unsigned long timeMeasure;
@@ -192,13 +192,13 @@ void check_sensor() {
         if (sensity_t < sensitivity && sensity_t > 40) {
           if (successiveMeasurements < debounceMeasurements) {
             successiveMeasurements++;
+            delay(33);
           } else {
             Consumer.write(MEDIA_VOLUME_UP); // Command volume up to pin the time
+            timeMeasure = millis();
+            digitalWrite(LED_RED, HIGH);
             successiveMeasurements = 0;
           }
-          timeMeasure = millis();
-          successiveMeasurements = 0;
-          digitalWrite(LED_RED, HIGH);
         }
       }
     }
