@@ -3,7 +3,7 @@
 #include <EasyButton.h>
 #include <EEPROM.h>
 #define BUTTON_PIN 9
-EasyButton button(BUTTON_PIN);
+EasyButton button(BUTTON_PIN, 100);
 
 int sensityPin = A0;
 int LED_RED = 6;
@@ -23,7 +23,7 @@ int sens0 = 49;  // 1m
 int blinks;
 int sensitivity;
 int clicks;
-int debounceMeasurements = 3; //successive measurements x 33ms needed to register
+int debounceMeasurements = 5; //successive measurements x 33ms needed to register
 int successiveMeasurements = 0;
 
 unsigned long timeMeasure;
