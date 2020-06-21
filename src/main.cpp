@@ -214,7 +214,7 @@ void setup() {
   button.begin();
   pinMode(LED_RED, OUTPUT);
   pinMode(LED_GREEN, OUTPUT);  
-  button.onSequence(2, 2000, two_click);
+  // button.onSequence(2, 2000, two_click);
   button.onPressedFor(THREE_SECONDS, setup_mode);
   button.onPressed(onPressed);
   sens_eeprom = EEPROM.read(0);   // Read sensitivity from EEPROM
